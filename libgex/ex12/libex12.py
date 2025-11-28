@@ -6,6 +6,7 @@ import numpy as np
 
 from ..dynamixel_sdk import PortHandler, PacketHandler
 from ..motor import Motor
+from .kinematics import KinEX12
 
 def load_config(config_file):
     with open(config_file, "r") as file:
@@ -32,7 +33,7 @@ class Glove:
         self.is_connected = False
         self.port = port
         self.name = NAME
-        self.kin = None 
+        self.kin = KinEX12() 
 
     def connect(self):
         """
@@ -61,8 +62,10 @@ class Glove:
         
         self.init_offsets = [0 if j<270 else 360 for j in init_js] # 初始上电会出现大于360度的角度，所以构建offset
         
-        print(init_js)
-        print(self.init_offsets)
+        print('init joint positions:', init_js)
+        print('joint offsets:', self.init_offsets)
+        
+        self.off()
 
     def off(self):
         """
@@ -78,4 +81,13 @@ class Glove:
         # 固定电机舵盘安装位置，初始角度90，因此减去90，然后减去初始上电的offset（如果有大于360度的情况）
         js = [m.get_pos() - 90 - o for m, o in zip(self.motors, self.init_offsets)] 
         
-        return js
+        return np.array(js)
+    
+    def fk(self):
+        js = self.getj()
+        
+        finger1_xyz = self.kin.fk_finger1(js[0:4])
+        finger2_xyz = self.kin.fk_finger2(js[4:8])
+        finger3_xyz = self.kin.fk_finger3(js[8:12])
+        
+        return np.array(finger1_xyz), np.array(finger2_xyz), np.array(finger3_xyz)
