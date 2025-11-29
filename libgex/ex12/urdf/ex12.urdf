@@ -152,8 +152,8 @@
       <geometry>
         <mesh filename="../meshes/Link13.STL" />
       </geometry>
-      <material name="">
-        <color rgba="1 1 1 1" />
+      <material name="red">
+        <color rgba="1 0 0 1" />
       </material>
     </visual>
     <collision>
@@ -297,8 +297,8 @@
       <geometry>
         <mesh filename="../meshes/Link14.STL" />
       </geometry>
-      <material name="">
-        <color rgba="1 1 1 1" />
+      <material name="green">
+        <color rgba="0 1 0 1" />
       </material>
     </visual>
     <collision>
@@ -441,8 +441,8 @@
       <geometry>
         <mesh filename="../meshes/Link15.STL" />
       </geometry>
-      <material name="">
-        <color rgba="1 1 1 1" />
+      <material name="blue">
+        <color rgba="0 0 1 1" />
       </material>
     </visual>
     <collision>

@@ -12,7 +12,7 @@ In this way, when the GX10 or EX12 is in machanical zero positions, all the moto
 
 #### GX10
 
-GX10 is a brand new tri-finger 10 DoF dexterous hand (viewed by [URDFly](https://github.com/Democratizing-Dexterous/URDFly)):
+GX10 is a brand new tri-finger 10 DoF dexterous hand (zero positions viewed by [URDFly](https://github.com/Democratizing-Dexterous/URDFly)):
 
 <img src='assets/gx10.png' width=60%>
 
@@ -22,7 +22,7 @@ GX10 has the same size of human and and optimized wiring (nearly no wire exposed
 
 #### EX12
 
-EX12 is a brand new tri-finger 12 DoF exoskeleton glove (viewed by [URDFly](https://github.com/Democratizing-Dexterous/URDFly)):
+EX12 is a brand new tri-finger 12 DoF exoskeleton glove (zero positions viewed by [URDFly](https://github.com/Democratizing-Dexterous/URDFly)):
 
 <img src='assets/ex12.png' width=60%>
 
