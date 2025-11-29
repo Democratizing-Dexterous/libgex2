@@ -7,6 +7,7 @@ import numpy as np
 from ..dynamixel_sdk import PortHandler, PacketHandler
 from ..motor import Motor
 from .kinematics import KinEX12
+from ..utils import search_ports, get_port_by_serial_number
 
 def load_config(config_file):
     with open(config_file, "r") as file:
@@ -29,11 +30,24 @@ MID_IDS = ex12_configs["HAND"]["MID_IDS"] # 中指ID
 
 
 class Glove:
-    def __init__(self, port) -> None:
+    
+    def __init__(self, port=None, serial_number=None) -> None:
+        
+        if port == None and serial_number == None:
+            print('Please using port or serial_number!')
+            sys.exit(0)
+        
         self.is_connected = False
-        self.port = port
-        self.name = NAME
-        self.kin = KinEX12() 
+        if port is not None:
+            self.port = port
+        else:
+            if serial_number is not None:
+                ports_info = search_ports()
+                if serial_number in ports_info:
+                    self.port = ports_info[serial_number]
+                else:
+                    print(f'Serial number: {serial_number} not available!')
+                    sys.exit(0)
 
     def connect(self):
         """

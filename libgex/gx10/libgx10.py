@@ -6,6 +6,7 @@ import numpy as np
 
 from ..dynamixel_sdk import PortHandler, PacketHandler
 from ..motor import Motor
+from ..utils import search_ports, get_port_by_serial_number
 
 # from .gx10 import kinematics
 
@@ -35,16 +36,32 @@ PROVEL = gx10_configs["ExtendedPos"]["Motor1"]['Profile_vel']
 PROACC = gx10_configs["ExtendedPos"]["Motor1"]['Profile_acc'] 
 
 class Hand:
-    def __init__(self, port) -> None:
+    def __init__(self, port=None, serial_number=None) -> None:
+        
+        if port == None and serial_number == None:
+            print('Please using port or serial_number!')
+            sys.exit(0)
+            
+        
         self.is_connected = False
-        self.port = port
+        if port is not None:
+            self.port = port
+        else:
+            if serial_number is not None:
+                ports_info = search_ports()
+                if serial_number in ports_info:
+                    self.port = ports_info[serial_number]
+                else:
+                    print(f'Serial number: {serial_number} not available!')
+                    sys.exit(0)
+            
         self.name = NAME
         self.kin = None 
 
     def connect(self, curr_limit=1000):
         """
         连接Hand，并且使能每个电机为默认的力控位置模式, 
-        curr_limit为电机最大限流(mA，最大不超过1750)，goal_current（要小于curr_limit）限制控制过程中最大力矩，goal_pwm限制运动速度（最大不超过885）
+        curr_limit为电机最大限流(mA，最大不超过1750)
         """
 
         portHandler = PortHandler(self.port)
@@ -98,101 +115,23 @@ class Hand:
         """
         motors = self.motors
         for m in motors:
-            m.set_pos(0)
+            m.set_pos(90)
         time.sleep(1)
 
     def getj(self):
         """
         获取GX10关节角度，单位度
         """
-        js = [m.get_pos() for m in self.motors]
+        # 固定电机舵盘安装位置，初始角度90，因此减去90
+        js = [m.get_pos() - 90  for m in self.motors]
         return js
     
     def setj(self, js):
         """
         设置GX10关节角度，单位度
         """
+        # 固定电机舵盘安装位置，初始角度90，因此加上90
         for m, j in zip(self.motors, js):
-            m.set_pos(j)
+            m.set_pos(j + 90 )
     
-    # def getj_finger1(self):
-    #     """
-    #     获取GX10指1关节角度，单位度
-    #     """
-    #     js = [m.get_pos() for m in self.motors[0:3]]
-    #     return js
-    
-    # def setj_finger1(self, js):
-    #     """
-    #     设置GX10指1关节角度，单位度
-    #     """
-    #     for m, j in zip(self.motors[0:3], js):
-    #         m.set_pos(j)
-
-    # def getj_finger2(self):
-    #     """
-    #     获取GX10指2关节角度，单位度
-    #     """
-    #     js = [m.get_pos() for m in self.motors[3:7]]
-    #     return js
-    
-    # def setj_finger2(self, js):
-    #     """
-    #     设置GX10指2关节角度，单位度
-    #     """
-    #     for m, j in zip(self.motors[3:7], js):
-    #         m.set_pos(j)
-
-    # def getj_finger3(self):
-    #     """
-    #     获取GX10指3关节角度，单位度
-    #     """
-    #     js = [m.get_pos() for m in self.motors[7:11]]
-    #     return js
-    
-    # def setj_finger3(self, js):
-    #     """
-    #     设置GX10指3关节角度，单位度
-    #     """
-    #     for m, j in zip(self.motors[7:11], js):
-    #         m.set_pos(j)
-    
-    
-    
-
-    # def fk_finger1(self):
-    #     """获取finger1的正运动学，单位m"""
-    #     xyz = self.kin.fk_finger1(self.getj_finger1())
-
-    #     return xyz
-    
-    # def ik_finger1(self, xyz):
-    #     """获取finger1的逆运动学，单位m"""
-    #     q = self.kin.ik_finger1(xyz)
-
-    #     return q
-
-
-    # def fk_finger2(self):
-    #     """获取finger2的正运动学，单位m"""
-    #     xyz = self.kin.fk_finger2(self.getj_finger2())
-
-    #     return xyz
-    
-    # def ik_finger2(self, xyz):
-    #     """获取finger2的逆运动学，单位m"""
-    #     q = self.kin.ik_finger2(xyz)
-
-    #     return q
-    
-    # def fk_finger3(self):
-    #     """获取finger3的正运动学，单位m"""
-    #     xyz = self.kin.fk_finger3(self.getj_finger3())
-
-    #     return xyz
-    
-    # def ik_finger3(self, xyz):
-    #     """获取finger3的逆运动学，单位m"""
-    #     q = self.kin.ik_finger3(xyz)
-
-    #     return q
+   
