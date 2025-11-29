@@ -48,6 +48,10 @@ class Glove:
                 else:
                     print(f'Serial number: {serial_number} not available!')
                     sys.exit(0)
+                    
+        self.name = NAME
+        self.kin = KinEX12()
+
 
     def connect(self):
         """
