@@ -10,7 +10,7 @@ p.setAdditionalSearchPath(pybullet_data.getDataPath())  # 用于查找常用模�
 
 # 加载地面
 p.loadURDF("plane.urdf")
-
+p.configureDebugVisualizer(p.COV_ENABLE_GUI, 0)
 # 加载你的机械手 URDF（修改为你的文件路径）
 # 假设 URDF 放在当前目录，且 joint 顺序和 glove 对应
 hand = p.loadURDF("libgex/ex12/urdf/ex12.urdf", basePosition=[0,0,0.2], baseOrientation=p.getQuaternionFromEuler([np.pi/2, 0, np.pi/2]), useFixedBase=True)
@@ -76,7 +76,7 @@ def normalize_angle(angle_rad):
 try:
     while True:
         # 从手套获取12个关节角度（单位：度）
-        qs = glove.getj()  # 返回长度为12的列表
+        qs = glove.getj().tolist()  # 返回长度为12的列表
         if qs and len(qs) >= 12:
             # 将角度转为弧度
             qs_rad = [q * np.pi / 180.0 for q in qs]

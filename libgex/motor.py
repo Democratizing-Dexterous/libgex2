@@ -133,7 +133,7 @@ class Motor:
         self.packet_handler.write1ByteTxRx(self.port_handler, self.id, self.addr_operating_mode, self.curr_operating_mode)
 
         
-    def init_config(self, curr_limit=1200):
+    def init_config(self, curr_limit=1200, goal_current=600, goal_pwm=200):
         """
         """
         for i in range(2):
@@ -142,8 +142,8 @@ class Motor:
             self.led_off()
             time.sleep(0.02)
             
-        self.set_curr_limit(curr_limit)
-        self.pos_model() 
+        self.set_curr_limit(curr_limit, goal_current, goal_pwm)
+        self.pos_force_mode() # 默认力控模式
 
     def set_pos(self, pos):
         """

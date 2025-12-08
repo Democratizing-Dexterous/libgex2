@@ -58,7 +58,7 @@ class Hand:
         self.name = NAME
         self.kin = None 
 
-    def connect(self, curr_limit=1000):
+    def connect(self, curr_limit=1000, goal_current=600, goal_pwm=200):
         """
         连接Hand，并且使能每个电机为默认的力控位置模式, 
         curr_limit为电机最大限流(mA，最大不超过1750)
@@ -81,7 +81,7 @@ class Hand:
         self.motors = [Motor(i+1, portHandler, packetHandler, curr_limit) for i in range(NUM_MOTORS)]
 
         for m in self.motors:
-            m.init_config(curr_limit=curr_limit)
+            m.init_config(curr_limit=curr_limit, goal_current=goal_current, goal_pwm=goal_pwm)
             m.set_profile(PROACC, PROVEL)
             m.set_pos_pid(POSKP, POSKD, POSKI)
         

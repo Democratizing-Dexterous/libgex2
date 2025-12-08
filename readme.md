@@ -29,3 +29,9 @@ EX12 is a brand new tri-finger 12 DoF exoskeleton glove (zero positions viewed b
 <img src='assets/ex12_real.png' width=60%>
 
 EX12 is fully optimized for wearable purpose (customized finger tip and wearable glove).
+
+### Reduce USB Latency (for GX10 U2D2)
+
+[U2D2 Manual](https://emanual.robotis.com/docs/en/parts/interface/u2d2/)
+
+Changing `/sys/bus/usb-serial/devices/ttyUSB0/latency_timer` to `1`.
