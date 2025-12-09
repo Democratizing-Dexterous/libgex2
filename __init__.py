@@ -1,1 +1,1 @@
-from libgex import Hand, Glove
+from .libgex import Hand, Glove
