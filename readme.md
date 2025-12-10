@@ -1,5 +1,6 @@
 ## Libgex2
 
+Python library for GX10 and EX12.
 ### Usage
 
 Basic requirements: x64 Ubuntu 22.04 and Python (>=3.8).
@@ -51,8 +52,24 @@ print(hand.getjs()) # get joint positions, unit: degree
 
 hand.setjs([0]*10) # equal to hand.home()
 
-hand.setj(10, 60) # set joint 10 to 60 degree
+hand.setj(10, 60) # set joint 10 (starting from 1) to 60 degree
 ```
+
+The joint order of the GX10 is:
+
+```
+1: thumb 1 (bottom)
+2: thumb 2
+3: thumb 3
+4: thumb 4 (tip)
+5: index 1 (bottom)
+6: index 2
+7: index 3 (tip)
+8: middle 1 (bottom)
+9: middle 2
+10: middle 3 (tip)
+```
+
 
 ### EX12
 Connect type-c USB to EX12, the device will be recognized as `/dev/ttyACM*` (usually `/dev/ttyACM0`), you can control the EX12 by:
@@ -73,7 +90,26 @@ print(glove.getjs()) # get joint positions, unit: degree
 thumb_tip_xyz, index_tip_xyz, mid_tip_xyz = glove.fk() # get finger XYZ coordinates, unit: m
 ```
 
+The joint order of the EX12 is:
+
+```
+1: thumb 1 (bottom)
+2: thumb 2
+3: thumb 3
+4: thumb 4 (tip)
+5: index 1 (bottom)
+6: index 2
+7: index 3 
+8: index 4 (tip)
+9: middle 1 (bottom)
+10: middle 2 
+11: middle 3 
+12: middle 4 (tip)
+```
+
 Detail of the API can be found [here (Chinese)](libgex/api.md).
+
+
 
 ### Main Updates
 
