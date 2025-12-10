@@ -12,9 +12,9 @@ HAND:
 
 ExtendedPos:
   Motor1: 
-    Pos_kp: 2000
-    Pos_kd: 200
-    Pos_ki: 100
+    Pos_kp: 300
+    Pos_kd: 100
+    Pos_ki: 10
     Profile_vel: 800 # unit 0.229 rev/min
     Profile_acc: 200 # unit 214.58 rev/min2
  

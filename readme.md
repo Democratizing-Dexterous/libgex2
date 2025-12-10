@@ -1,5 +1,80 @@
 ## Libgex2
 
+### Usage
+
+Basic requirements: x64 Ubuntu 22.04 and Python (>=3.8).
+
+Python requirements:
+
+```
+pip install pyserial
+pip install pybullet
+pip install numpy
+```
+
+Add the current user to the `dialout` group so that it can access the serial devices (no need to `chmod 777 /dev/ttyUSB* or /dev/ttyACM*`):
+
+```bash
+sudo usermod -a -G dialout $USER
+```
+
+Change the latency timer of the GX10 U2D2 to `1` (default is `16`), otherwise the latency will be `16` ms:
+
+```bash
+echo 1 | sudo tee /sys/bus/usb-serial/devices/ttyUSB0/latency_timer
+```
+
+or changing all `ttyUSB*` by:
+```bash
+for dev in /sys/bus/usb-serial/devices/ttyUSB*/latency_timer; do
+    echo 1 | sudo tee "$dev"
+done
+```
+
+#### GX10
+
+Connect 5V DC power and usb to the GX10, the device will be recognized as `/dev/ttyUSB*` (usually `/dev/ttyUSB0`), you can control the GX10 by: 
+
+```python
+import sys
+sys.path.append('<path_to_libgex2>') # replace with the actual path to libgex2
+
+from libgex2 import Hand
+import numpy as np
+
+
+hand = Hand("/dev/ttyUSB0")  # or using serial_number='XXXX'
+hand.connect(curr_limit=1000, goal_current=600, goal_pwm=200)
+
+hand.home() # move to home position
+print(hand.getjs()) # get joint positions, unit: degree
+
+hand.setjs([0]*10) # equal to hand.home()
+
+hand.setj(10, 60) # set joint 10 to 60 degree
+```
+
+### EX12
+Connect type-c USB to EX12, the device will be recognized as `/dev/ttyACM*` (usually `/dev/ttyACM0`), you can control the EX12 by:
+
+```python
+import sys
+sys.path.append('<path_to_libgex2>') # replace with the actual path to libgex2
+
+from libgex2 import Glove
+import numpy as np
+
+
+glove = Glove("/dev/ttyUSB0")  # or using serial_number='XXXX'
+glove.connect()
+
+print(glove.getjs()) # get joint positions, unit: degree
+
+thumb_tip_xyz, index_tip_xyz, mid_tip_xyz = glove.fk() # get finger XYZ coordinates, unit: m
+```
+
+Detail of the API can be found [here (Chinese)](libgex/api.md).
+
 ### Main Updates
 
 #### No Need to Set Zero
@@ -20,6 +95,8 @@ GX10 is a brand new tri-finger 10 DoF dexterous hand (zero positions viewed by [
 
 GX10 has the same size of human and and optimized wiring (nearly no wire exposed).
 
+The urdf file of GX10 is [here](libgex/gx10/urdf/gx10.urdf).
+
 #### EX12
 
 EX12 is a brand new tri-finger 12 DoF exoskeleton glove (zero positions viewed by [URDFly](https://github.com/Democratizing-Dexterous/URDFly)):
@@ -30,8 +107,4 @@ EX12 is a brand new tri-finger 12 DoF exoskeleton glove (zero positions viewed b
 
 EX12 is fully optimized for wearable purpose (customized finger tip and wearable glove).
 
-### Reduce USB Latency (for GX10 U2D2)
-
-[U2D2 Manual](https://emanual.robotis.com/docs/en/parts/interface/u2d2/)
-
-Changing `/sys/bus/usb-serial/devices/ttyUSB0/latency_timer` to `1`.
+The urdf file of EX12 is [here](libgex/ex12/urdf/ex12.urdf).

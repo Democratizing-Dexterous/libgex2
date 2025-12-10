@@ -1,3 +1,7 @@
+import sys
+
+sys.path.append("../")  # replace with the actual path to libgex2
+
 import time
 import pybullet as p
 import pybullet_data
@@ -13,7 +17,12 @@ p.loadURDF("plane.urdf")
 p.configureDebugVisualizer(p.COV_ENABLE_GUI, 0)
 # 加载你的机械手 URDF（修改为你的文件路径）
 # 假设 URDF 放在当前目录，且 joint 顺序和 glove 对应
-hand = p.loadURDF("libgex/ex12/urdf/ex12.urdf", basePosition=[0,0,0.2], baseOrientation=p.getQuaternionFromEuler([np.pi/2, 0, np.pi/2]), useFixedBase=True)
+hand = p.loadURDF(
+    "libgex/ex12/urdf/ex12.urdf",
+    basePosition=[0, 0, 0.2],
+    baseOrientation=p.getQuaternionFromEuler([np.pi / 2, 0, np.pi / 2]),
+    useFixedBase=True,
+)
 
 cam_pos = [-0.71, 0.16, -0.13]
 pitch_deg = -26.60
@@ -32,11 +41,11 @@ p.resetDebugVisualizerCamera(
     cameraDistance=cam_distance,
     cameraYaw=cam_yaw,
     cameraPitch=cam_pitch,
-    cameraTargetPosition=target_pos
+    cameraTargetPosition=target_pos,
 )
 
 # 初始化手套
-glove = Glove('COM11')
+glove = Glove("/dev/ttyACM0")
 glove.connect()
 
 # 获取模型中的可动关节（revolute/prismatic）
@@ -55,48 +64,31 @@ print(f"找到 {len(revolute_joint_indices)} 个可动关节")
 
 # 检查关节数量是否匹配
 if len(revolute_joint_indices) != 12:
-    print(f"警告: URDF有{len(revolute_joint_indices)}个可动关节，但手套提供12个数据，可能不匹配")
+    print(
+        f"警告: URDF有{len(revolute_joint_indices)}个可动关节，但手套提供12个数据，可能不匹配"
+    )
 
 # 设置仿真参数
 p.setGravity(0, 0, -9.81)
 p.setRealTimeSimulation(1)  # 开启实时模式
 
-print("开始实时同步手套数据到 PyBullet... (Ctrl+C 退出)")
 
-def normalize_angle(angle_rad):
-    """
-    将角度归一化到 [-π, π] 范围内
-    """
-    if angle_rad > np.pi * 2:
-        print('outlier:', angle_rad)
-        angle_rad = angle_rad - np.pi*2
-        
-    return angle_rad
+while True:
+    # 从手套获取12个关节角度（单位：度）
+    qs = glove.getj().tolist()  # 返回长度为12的列表
+    if qs and len(qs) >= 12:
+        # 将角度转为弧度
+        qs_rad = [q * np.pi / 180.0 for q in qs]
 
-try:
-    while True:
-        # 从手套获取12个关节角度（单位：度）
-        qs = glove.getj().tolist()  # 返回长度为12的列表
-        if qs and len(qs) >= 12:
-            # 将角度转为弧度
-            qs_rad = [q * np.pi / 180.0 for q in qs]
+        # 将手套数据映射到模型关节
+        # 只控制可旋转关节
+        for i in range(min(len(qs_rad), len(revolute_joint_indices))):
+            p.setJointMotorControl2(
+                hand,
+                revolute_joint_indices[i],
+                controlMode=p.POSITION_CONTROL,
+                targetPosition=qs_rad[i],
+                force=5,
+            )
 
-        
-            
-            # 将手套数据映射到模型关节
-            # 只控制可旋转关节
-            for i in range(min(len(qs_rad), len(revolute_joint_indices))):
-                p.setJointMotorControl2(
-                    hand,
-                    revolute_joint_indices[i],
-                    controlMode=p.POSITION_CONTROL,
-                    targetPosition=qs_rad[i],
-                    force=5
-                )
-
-        time.sleep(0.01)  # 控制刷新频率
-
-except KeyboardInterrupt:
-    print("退出程序")
-finally:
-    p.disconnect()
+    time.sleep(0.01)  # 控制刷新频率
