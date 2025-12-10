@@ -109,6 +109,59 @@ The joint order of the EX12 is:
 
 Detail of the API can be found [here (Chinese)](libgex/api.md).
 
+### Retargeting from EX12 to GX10 (Dexterous Teleoperation)
+
+The retargeting code is in [gex_retargeting_sim](https://github.com/Democratizing-Dexterous/gex_retargeting_sim). Put folder `gex_retargeting_sim` in the same directory level as `libgex2`.
+
+```python
+import sys
+sys.path.append('<path_to_libgex2>') # replace with the actual path to libgex2, gex_retargeting_sim is in the same directory level as libgex2
+
+
+import numpy as np
+import time
+
+from libgex import Hand, Glove
+from gex_retargeting_sim import GexRetarget
+
+gex_retarget = GexRetarget()
+
+
+hand = Hand(port="/dev/ttyUSB0")  
+hand.connect()
+
+
+glove = Glove(port="/dev/ttyACM0") 
+glove.connect()
+
+print("start retargeting...")
+
+while True:
+
+    glove_base_pose = np.array([0, 0, 0])
+
+    glove_finger1_pos, glove_finger2_pos, glove_finger3_pos = glove.fk()
+
+    glove_fingers_pos = np.concatenate(
+        [
+            glove_base_pose[None, :],
+            glove_finger1_pos[None, :],
+            glove_finger2_pos[None, :],
+            glove_finger3_pos[None, :],
+        ],
+        axis=0,
+    )
+
+    qpos = gex_retarget.retarget(glove_fingers_pos)
+
+    qpos_degree = qpos * 180 / np.pi
+
+    hand.setj(qpos_degree)
+```
+
+By running the code above, you can move the glove to control the dexterous hand as following:
+
+<img src='assets/retarget_real.png' width=45%>
 
 
 ### Main Updates
@@ -117,7 +170,7 @@ Detail of the API can be found [here (Chinese)](libgex/api.md).
 
 No need to set zero of the motors. The zero position of the GX10 or EX12 should be installed as following (The red rectangle should be aligned with the 'D'):
 
-<img src='assets/motor_zero.png' width=60%>
+<img src='assets/motor_zero.png' width=45%>
 
 In this way, when the GX10 or EX12 is in machanical zero positions, all the motors should have 90 degree position reading from the sensor.
 
@@ -125,9 +178,9 @@ In this way, when the GX10 or EX12 is in machanical zero positions, all the moto
 
 GX10 is a brand new tri-finger 10 DoF dexterous hand (zero positions viewed by [URDFly](https://github.com/Democratizing-Dexterous/URDFly)):
 
-<img src='assets/gx10.png' width=60%>
+<img src='assets/gx10.png' width=45%>
 
-<img src='assets/gx10_real.png' width=60%>
+<img src='assets/gx10_real.png' width=45%>
 
 GX10 has the same size of human and and optimized wiring (nearly no wire exposed).
 
@@ -137,9 +190,9 @@ The urdf file of GX10 is [here](libgex/gx10/urdf/gx10.urdf).
 
 EX12 is a brand new tri-finger 12 DoF exoskeleton glove (zero positions viewed by [URDFly](https://github.com/Democratizing-Dexterous/URDFly)):
 
-<img src='assets/ex12.png' width=60%>
+<img src='assets/ex12.png' width=45%>
 
-<img src='assets/ex12_real.png' width=60%>
+<img src='assets/ex12_real.png' width=45%>
 
 EX12 is fully optimized for wearable purpose (customized finger tip and wearable glove).
 
