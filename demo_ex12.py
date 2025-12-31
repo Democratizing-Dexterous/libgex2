@@ -45,7 +45,7 @@ p.resetDebugVisualizerCamera(
 )
 
 # 初始化手套
-glove = Glove("/dev/ttyACM0")
+glove = Glove("/dev/ttyUSB0", left=False)  # or "/dev/ttyUSB0" if you are using u2d2
 glove.connect()
 
 # 获取模型中的可动关节（revolute/prismatic）
@@ -75,7 +75,8 @@ p.setRealTimeSimulation(1)  # 开启实时模式
 
 while True:
     # 从手套获取12个关节角度（单位：度）
-    qs = glove.getj().tolist()  # 返回长度为12的列表
+    qs = glove.getjs().tolist()  # 返回长度为12的列表
+    print(qs)
     if qs and len(qs) >= 12:
         # 将角度转为弧度
         qs_rad = [q * np.pi / 180.0 for q in qs]

@@ -84,7 +84,7 @@ from libgex2 import Glove
 import numpy as np
 
 
-glove = Glove("/dev/ttyUSB0")  # or using serial_number='XXXX'
+glove = Glove("/dev/ttyUSB0", left=False)  # or using serial_number='XXXX', left=True for left hand
 glove.connect()
 
 print(glove.getjs()) # get joint positions, unit: degree
@@ -158,7 +158,7 @@ while True:
 
     qpos_degree = qpos * 180 / np.pi
 
-    hand.setj(qpos_degree)
+    hand.setjs(qpos_degree)
 ```
 
 By running the code above, you can move the glove to control the dexterous hand as following:

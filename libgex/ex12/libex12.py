@@ -31,11 +31,19 @@ MID_IDS = ex12_configs["HAND"]["MID_IDS"]  # 中指ID
 
 class Glove:
 
-    def __init__(self, port=None, serial_number=None) -> None:
+    def __init__(self, port=None, serial_number=None, left=False) -> None:
 
         if port == None and serial_number == None:
             print("Please using port or serial_number!")
             sys.exit(0)
+
+        self.left_directions = [-1, -1, -1, -1, 1, -1, -1, -1, 1, -1, -1, -1]
+        self.right_directions = [1] * 12
+
+        if left:
+            self.directions = self.left_directions
+        else:
+            self.directions = self.right_directions
 
         self.is_connected = False
         if port is not None:
@@ -100,7 +108,10 @@ class Glove:
         获取EX12关节角度，单位度
         """
         # 固定电机舵盘安装位置，初始角度90，因此减去90，然后减去初始上电的offset（如果有大于360度的情况）
-        js = [m.get_pos() - 90 - o for m, o in zip(self.motors, self.init_offsets)]
+        js = [
+            (m.get_pos() - 90 - o) * d
+            for m, d, o in zip(self.motors, self.directions, self.init_offsets)
+        ]
 
         return np.array(js)
 
