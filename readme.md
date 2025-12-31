@@ -15,6 +15,8 @@ pip install numpy
 
 Add the current user to the `dialout` group so that it can access the serial devices (no need to `chmod 777 /dev/ttyUSB* or /dev/ttyACM*`):
 
+OpenRB150 will be recognized as `/dev/ttyACM*` (usually `/dev/ttyACM0`). U2D2 will be recognized as `/dev/ttyUSB*` (usually `/dev/ttyUSB0`).
+
 ```bash
 sudo usermod -a -G dialout $USER
 ```
