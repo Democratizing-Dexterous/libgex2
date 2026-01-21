@@ -35,11 +35,13 @@ PROACC = gx10_configs["ExtendedPos"]["Motor1"]["Profile_acc"]
 
 
 class Hand:
-    def __init__(self, port=None, serial_number=None) -> None:
+    def __init__(self, port=None, serial_number=None, trigger_id=0) -> None:
 
         if port == None and serial_number == None:
             print("Please using port or serial_number!")
             sys.exit(0)
+
+        self.trigger_id = trigger_id
 
         self.is_connected = False
         if port is not None:
@@ -88,6 +90,16 @@ class Hand:
             # m.set_profile(PROACC, PROVEL)
             # m.set_pos_pid(POSKP, POSKD, POSKI)
         print(f"{self.name} init done...")
+
+        if self.trigger_id != 0:
+            self.motor_trigger = Motor(self.trigger_id, portHandler, packetHandler)
+            self.motor_trigger.init_config(
+                goal_current=45
+            )  # trigger pos force mode with small current
+            self.motor_trigger.torq_on()
+            self.motor_trigger.set_pos(300)
+            print(f"{self.name} trigger init done...")
+            time.sleep(1)
 
     def off(self):
         """
